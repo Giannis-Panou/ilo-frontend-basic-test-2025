@@ -1,6 +1,33 @@
 /* styles.css */
 
 /* Προσθέστε εδώ τα δικά σας styles */
+#posts ul {
+	list-style: none;
+	padding: 0;
+}
+
+.post {
+	padding: 10px;
+	cursor: pointer;
+	border-radius: 25px;
+	margin: 10px 0 10px 0px;
+	box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8);
+}
+
+#posts li:hover {
+	background-color: #f0f0f0;
+}
+
+.active {
+	background-color: #e0e0e0;
+}
+
+@media (max-width: 600px) {
+	#posts,
+	#details {
+		width: 100%;
+	}
+}
 
 /* Παράδειγμα:
 #posts ul {

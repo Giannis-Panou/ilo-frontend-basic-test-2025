@@ -4,50 +4,71 @@ async function getPosts() {
 		const response = await fetch('https://jsonplaceholder.typicode.com/posts');
 		const posts = await response.json();
 		const postsDiv = document.getElementById('posts');
-		postsDiv.innerHTML = '';
-		posts.slice(0, 10).forEach((post) => {
-			const postElement = document.createElement('div');
-			postElement.className = 'post';
-			postElement.innerHTML = `
-        <h3>${post.title}</h3>
-        <p>${post.body}</p>
-        <button onclick="showDetails(${post.id})">Δείτε λεπτομέρειες</button>
-      `;
-			postsDiv.appendChild(postElement);
-		});
-	} catch (error) {
-		document.getElementById('posts').innerText = 'Σφάλμα φόρτωσης δεδομένων';
-	}
-}
 
-// Συνάρτηση για εμφάνιση λεπτομερειών και σχολίων για ένα post
-async function showDetails(id) {
-	const detailsDiv = document.getElementById('details');
-	detailsDiv.innerHTML = '';
-	try {
-		const postRes = await fetch(
-			`https://jsonplaceholder.typicode.com/posts/${id}`
-		);
-		const post = await postRes.json();
-		const commentsRes = await fetch(
-			`https://jsonplaceholder.typicode.com/comments?postId=${id}`
-		);
-		const comments = await commentsRes.json();
-		detailsDiv.innerHTML = `
-      <h2>${post.title}</h2>
-      <p>${post.body}</p>
-      <h3>Σχόλια:</h3>
+		// Καθαρισμός προηγούμενων δεδομένων
+		postsDiv.innerHTML = '';
+
+		// Δημιουργία HTML για κάθε post και  προσθήκη στο postsDiv
+		const html = `
       <ul>
-        ${comments
+        ${posts
+					.slice(0, 10)
 					.map(
-						(comment) =>
-							`<li><strong>${comment.name}:</strong> ${comment.body}</li>`
+						(post) => `
+          <li onclick="showDetails(this, ${post.id})" class="post">
+            <h2>${post.title}</h2>
+            <p>${post.body}</p>
+            <div id="details"></div>
+          </li>
+        `
 					)
 					.join('')}
       </ul>
     `;
+
+		postsDiv.innerHTML = html;
 	} catch (error) {
-		detailsDiv.innerText = 'Σφάλμα φόρτωσης λεπτομερειών';
+		document.getElementById('posts').innerText = 'Error loading posts';
+	}
+}
+
+// Συνάρτηση για εμφάνιση λεπτομερειών και σχολίων για ένα post
+async function showDetails(post, id) {
+	const detailsDiv = post.querySelector('#details');
+
+	// Toggle εμφάνισης του detailsDiv
+	if (detailsDiv.style.display === 'block') {
+		detailsDiv.style.display = 'none';
+		return;
+	} else if (!detailsDiv.innerHTML) {
+		try {
+			const postRes = await fetch(
+				`https://jsonplaceholder.typicode.com/posts/${id}`
+			);
+			const post = await postRes.json();
+			const commentsRes = await fetch(
+				`https://jsonplaceholder.typicode.com/comments?postId=${id}`
+			);
+			const comments = await commentsRes.json();
+
+			// Δημιουργία HTML για σχόλια
+			detailsDiv.innerHTML = `
+      <h5>Comments:</h5>
+      <ul>
+        ${comments
+					.map(
+						(comment) =>
+							`<li class='comments'><strong>${comment.name}:</strong> ${comment.body}</li>`
+					)
+					.join('')}
+      </ul>
+    `;
+		} catch (error) {
+			detailsDiv.innerText = 'Error loading post details or comments';
+		}
+		detailsDiv.style.display = 'block';
+	} else {
+		detailsDiv.style.display = 'block';
 	}
 }
 
