@@ -9,24 +9,22 @@ async function getPosts() {
 		postsDiv.innerHTML = '';
 
 		// Δημιουργία HTML για κάθε post και  προσθήκη στο postsDiv
-		const html = `
-      <ul>
-        ${posts
-					.slice(0, 10)
-					.map(
-						(post) => `
-          <li onclick="showDetails(this, ${post.id})" class="post">
-            <h2>${post.title}</h2>
-            <p>${post.body}</p>
-            <div id="details"></div>
-          </li>
-        `
-					)
-					.join('')}
-      </ul>
-    `;
+		const postsList = `
+			<ul id="posts-list">
+				${posts.slice(0, 10).map((post) => `
+					<li onclick="showDetails(this, ${post.id})" class="post">
+						<div class="post-header">
+							<h2>${post.title}</h2>
+							<span class='arrow'> &#11206 </span>
+						</div>
+							<p>${post.body}</p>
+							<div id="details"></div>
+					</li>
+				`).join('')}
+			</ul>
+		`;
 
-		postsDiv.innerHTML = html;
+		postsDiv.innerHTML = postsList;
 	} catch (error) {
 		document.getElementById('posts').innerText = 'Error loading posts';
 	}
@@ -35,12 +33,18 @@ async function getPosts() {
 // Συνάρτηση για εμφάνιση λεπτομερειών και σχολίων για ένα post
 async function showDetails(post, id) {
 	const detailsDiv = post.querySelector('#details');
+	const arrow = post.querySelector('.arrow');
 
-	// Toggle εμφάνισης του detailsDiv
-	if (detailsDiv.style.display === 'block') {
-		detailsDiv.style.display = 'none';
+	// Ελέγχουμε αν το detailsDiv είναι ήδη ανοιχτό
+	if (detailsDiv.classList.contains('active')) {
+		detailsDiv.style.maxHeight = '0';
+		detailsDiv.classList.remove('active');
+		arrow.classList.remove('rotated');
 		return;
-	} else if (!detailsDiv.innerHTML) {
+	}
+
+	// Κάνουμε fetch τα details εφοσον δεν υπαρχουν ηδη
+	if (detailsDiv.innerHTML === '') {
 		try {
 			const postRes = await fetch(
 				`https://jsonplaceholder.typicode.com/posts/${id}`
@@ -51,25 +55,24 @@ async function showDetails(post, id) {
 			);
 			const comments = await commentsRes.json();
 
-			// Δημιουργία HTML για σχόλια
+			// Δημιουργία HTML για τα σχόλια
 			detailsDiv.innerHTML = `
-      <h5>Comments:</h5>
-      <ul>
-        ${comments
-					.map(
-						(comment) =>
-							`<li class='comments'><strong>${comment.name}:</strong> ${comment.body}</li>`
-					)
-					.join('')}
-      </ul>
-    `;
+				<h5>Comments:</h5>
+				<ul id="comments-list">
+				${comments.map((comment) =>`
+					<li class='comments'><strong>${comment.name}:</strong> ${comment.body}</li>
+					`).join('')}
+				</ul>
+    		`;
 		} catch (error) {
 			detailsDiv.innerText = 'Error loading post details or comments';
 		}
-		detailsDiv.style.display = 'block';
-	} else {
-		detailsDiv.style.display = 'block';
 	}
+
+	// Εμφανιση των details εφοσον εχουν γινει ηδη fetch
+	detailsDiv.style.maxHeight = detailsDiv.scrollHeight + 'px';
+	detailsDiv.classList.toggle('active');
+	arrow.classList.add('rotated');
 }
 
 document.addEventListener('DOMContentLoaded', getPosts);
