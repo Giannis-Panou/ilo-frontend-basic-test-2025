@@ -13,20 +13,16 @@ async function getPosts() {
 		// Δημιουργία HTML για κάθε post και προσθήκη στο postsDiv
 		const postsList = `
 			<ul id="posts-list">
-				${posts
-					.map(
-						(post) => `
-						<li onclick="showDetails(this, ${post.id})" class="post">
-							<div class="post-header">
-								<h2>${post.title}</h2>
-								<span class='arrow'> &#11206 </span>
-							</div>
-								<p>${post.body}</p>
-								<div id="details"></div>
-						</li>
-						`
-					)
-					.join('')}
+				${posts.map((post) => `
+					<li onclick="showDetails(this, ${post.id})" class="post">
+						<div class="post-header">
+							<h2>${post.title}</h2>
+							<span class='arrow'> &#11206 </span>
+						</div>
+							<p>${post.body}</p>
+							<div id="details"></div>
+					</li>
+				`).join('')}
 			</ul>
 		`;
 
@@ -75,13 +71,9 @@ async function showDetails(post, id) {
 
 				<h4>Comments:</h4>
 				<ul id="comments-list">
-				${comments
-					.map(
-						(comment) => `
-					<li class='comments'><strong>${comment.name}:</strong> ${comment.body}</li>
-					`
-					)
-					.join('')}
+				${comments.map((comment) => `
+						<li class='comments'><strong>${comment.name}:</strong> ${comment.body}</li>
+					`).join('')}
 				</ul>
     		`;
 		} catch (error) {
