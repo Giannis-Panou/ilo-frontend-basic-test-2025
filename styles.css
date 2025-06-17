@@ -67,4 +67,8 @@ h1 {
 	.arrow {
 		margin-right: 0px;
 	}
+
+	.post h2 {
+		margin-right: 20px;
+	}
 }
